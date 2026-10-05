@@ -16,7 +16,7 @@ Preserve the existing copyright and permission notice.
 The distribution name is `hermes-plugin-openviking`. The provider, plugin, and
 future Hermes catalog key remain `openviking`. Existing `memory.openviking`
 settings, environment variables, linked `ovcli.conf` files, data paths, and
-`viking_*` tools keep their current behavior.
+automatic recall, capture and commit retain their behavior. Explicit tools use the server's MCP schemas.
 
 The active-session commit lifecycle was ported from
 [KoNit-K's Hermes PR #112533](https://github.com/NousResearch/hermes-agent/pull/112533),
@@ -71,6 +71,36 @@ Source builds use package version pins without reviewed binary hashes. A platfor
 needs a tested OpenViking/embedding-wheel pair for the prebuilt path.
 Setup also checks LLM access through the installed OpenViking backend. The CI
 fixture must serve an actual completion; an unreachable LLM must fail setup.
+
+MCP tools adapt the intent of [Hermes PR #86052](https://github.com/NousResearch/hermes-agent/pull/86052).
+A profile-scoped stdio adapter forwards to `/mcp`; it reuses the provider's
+connection resolver so linked credentials and Quick Local ports stay current.
+It does not manage the server process, rewrite tool schemas or retry writes.
+
+### MCP host compatibility
+
+Fresh setup uses Hermes's `trust: full` default, with a notice that all exposed
+tools can run without per-call approval, including recursive deletion. Existing
+trust settings and tool filters are preserved. This policy permits interactive
+and unattended use without depending on the host's approval UI.
+
+Opt-in `trust: untrusted` needs Hermes to recognize MCP SDK 2's `read_only_hint`
+Python attribute. The tested CI pin `5bba024d8ddd388f56f354c1f789be825e3d8a3c` and
+v2026.9.24 read only `readOnlyHint`. Every tool is therefore classified as
+write-capable. [Hermes #111270](https://github.com/NousResearch/hermes-agent/pull/111270)
+proposes a focused fix. Keep tool annotations unchanged in this plugin.
+
+Classic CLI consent routing is fixed on Hermes main by
+`ef1faa4cf810423513a8a5b6ff81afbcf215c363`; the older test hosts lack that fix.
+Unattended workers intentionally decline consent. `trust: full` bypasses the
+approval gate but does not repair annotation handling.
+
+Before considering `untrusted` as a future default, validate a released Hermes
+build with both fixes: read-only calls without approval, interactive write
+approval and denial, and unattended write refusal. `search` is annotated writable
+by OpenViking, so it still requires approval after the host fix. Update the tested
+host pin and baseline from that evidence, and preserve existing trust choices.
+Green plugin tests alone do not establish that the host's approval flow works.
 
 ## Migration coordination
 
