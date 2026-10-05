@@ -109,6 +109,10 @@ export const sections: DocSection[] = [
         p('agent-integrations/19-recall-tuning'),
         p('agent-integrations/18-plugin-development')
       ]),
+      g('Context Gateway', '上下文网关', [
+        p('guides/15-context-gateway'),
+        p('guides/22-context-gateway-operations')
+      ]),
       g('VikingBot', 'VikingBot', [
         p('guides/17-vikingbot'),
         p('guides/12-vikingbot-metrics-validation')

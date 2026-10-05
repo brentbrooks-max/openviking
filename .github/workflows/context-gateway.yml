@@ -1,0 +1,15 @@
+name: Context Gateway
+on:
+  pull_request:
+    paths: ["openviking_context_gateway/**", "tests/context_gateway/**", "scripts/*context*gateway*", "openviking/server/routers/context_gateway.py", "openviking_cli/utils/config/context_gateway_config.py", "pyproject.toml", ".github/workflows/context-gateway.yml"]
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install ".[context-gateway]" pytest pytest-asyncio httpx
+      - run: PYTHONPATH=. pytest tests/context_gateway --confcutdir=tests/context_gateway -o addopts=''
